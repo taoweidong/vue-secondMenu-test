@@ -18,8 +18,7 @@
 				<div class="header-user-con">
 					<div class="version_select">
 						<el-select v-model="value" placeholder="请选择" style="width:100%">
-							<el-option v-for="item in options" :key="item.value" :label="item.label"
-								:value="item.value">
+							<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
 							</el-option>
 						</el-select>
 					</div>
@@ -46,7 +45,18 @@
 		</div>
 
 		<!-- 页面左侧二级菜单栏，和主体内容区域部分 -->
+
 		<el-main>
+			<div class="bs-sysMsg" v-if="systemMsg.length > 0">
+				<i class="el-alert__icon el-icon-warning"></i>
+				<div class="msg__content">
+					<el-carousel height="20px" direction="vertical" indicator-position="none" :autoplay="true">
+						<el-carousel-item v-for="item in systemMsg" :key="item.id">
+							<a href="javascript:void(0)" class="item">{{ item.title }}</a>
+						</el-carousel-item>
+					</el-carousel>
+				</div>
+			</div>
 			<router-view></router-view>
 		</el-main>
 
@@ -54,209 +64,209 @@
 </template>
 
 <script>
-	import bus from "@/utils/bus";
-	export default {
-		data() {
-			return {
-				options: [{
-					value: '23B',
-					label: '23B'
-				}, {
-					value: '23A',
-					label: '23A'
-				}, {
-					value: '22B',
-					label: '22B'
-				}],
+import bus from "@/utils/bus";
+export default {
+	data() {
+		return {
+			systemMsg: [
+				{ id: 1, title: '入主白宫近10日 拜登做了10件大事' },
+				{ id: 2, title: '全民带货？小红书外链淘宝权限将大范围开放' },
+				{ id: 3, title: '贾跃亭FF将在纳斯达克上市 股票代码为FFIE' }
+			],
+			options: [{
 				value: '23B',
-				itemList: [ // 水平一级菜单栏的菜单
-					{
-						path: '/Home',
-						title: '首页'
-					},
-					{
-						path: '/test1',
-						title: '一级菜单1'
-					},
-					{
-						path: '/test2',
-						title: '一级菜单2'
-					},
-					{
-						path: '/test3',
-						title: '一级菜单3'
-					},
-					{
-						path: '/permission',
-						title: '管理员权限'
-					},
-					// { path: '/i18n', title: '国际化组件' }
-				],
-				globalTheme: false,
-			}
+				label: '23B'
+			}, {
+				value: '23A',
+				label: '23A'
+			}, {
+				value: '22B',
+				label: '22B'
+			}],
+			value: '23B',
+			itemList: [ // 水平一级菜单栏的菜单
+				{
+					path: '/Home',
+					title: '首页'
+				},
+				{
+					path: '/test1',
+					title: '一级菜单1'
+				},
+				{
+					path: '/test2',
+					title: '一级菜单2'
+				},
+				{
+					path: '/test3',
+					title: '一级菜单3'
+				},
+				{
+					path: '/permission',
+					title: '管理员权限'
+				},
+				// { path: '/i18n', title: '国际化组件' }
+			],
+			globalTheme: false,
+		}
+	},
+	computed: {
+		username() {
+			return localStorage.getItem('ms_username') || '';
 		},
-		computed: {
-			username() {
-				return localStorage.getItem('ms_username') || '';
-			},
-			toIndex() { // 根据路径绑定到对应的一级菜单，防止页面刷新重新跳回第一个
-				return '/' + this.$route.path.split('/')[1];
-			},
+		toIndex() { // 根据路径绑定到对应的一级菜单，防止页面刷新重新跳回第一个
+			return '/' + this.$route.path.split('/')[1];
 		},
-		created() {
-			this.globalTheme = JSON.parse(localStorage.getItem('global_theme'));
-			bus.$emit('global_theme', this.globalTheme); // 将 globalTheme 的值传给父组件
+	},
+	created() {
+		this.globalTheme = JSON.parse(localStorage.getItem('global_theme'));
+		bus.$emit('global_theme', this.globalTheme); // 将 globalTheme 的值传给父组件
+	},
+	methods: {
+		handleSelect(path) { // 切换菜单栏
+			this.$router.push({
+				path: path
+			});
 		},
-		methods: {
-			handleSelect(path) { // 切换菜单栏
+		handleCommand(command) { // 用户名下拉菜单选择事件
+			if (command == 'loginout') {
+				localStorage.removeItem('ms_username');
 				this.$router.push({
-					path: path
+					path: '/Login'
 				});
-			},
-			handleCommand(command) { // 用户名下拉菜单选择事件
-				if (command == 'loginout') {
-					localStorage.removeItem('ms_username');
-					this.$router.push({
-						path: '/Login'
-					});
-				}
-			},
-			handleChangeStyle() { // 切换主题
-				this.globalTheme = !this.globalTheme;
-				localStorage.setItem('global_theme', this.globalTheme); // 本地存储选择的 globalTheme
-				bus.$emit('global_theme', this.globalTheme); // 将 globalTheme 的值传给父组件
 			}
+		},
+		handleChangeStyle() { // 切换主题
+			this.globalTheme = !this.globalTheme;
+			localStorage.setItem('global_theme', this.globalTheme); // 本地存储选择的 globalTheme
+			bus.$emit('global_theme', this.globalTheme); // 将 globalTheme 的值传给父组件
 		}
 	}
+}
 </script>
 
-<style scoped>
-	/* 修改下拉选项的样式 */
-	/deep/.select-popper {
-		background-color: $item-bg-color;
-		border-radius: 0.08rem;
-		border: solid 0.02rem #1c395d;
-		font-family: PingFangSC-Regular;
+<style lang="scss" scoped>
+/*轮翻消息*/
+.bs-sysMsg {
+	position: relative;
+	display: flex;
+	width: 100%;
+	padding: 8px 12px;
+	margin-bottom: 10px;
+	border-radius: 2px;
+	color: #e6a23c;
+	background-color: #fdf6ec;
+	overflow: hidden;
+	opacity: 1;
+	align-items: center;
+	transition: opacity .2s;
+}
 
-		.el-select-dropdown__item.selected {
-			font-family: PingFangSC-Regular;
-			font-size: 0.28rem;
-			color: rgba(74, 141, 253, 1);
-		}
+.bs-sysMsg .msg__content {
+	display: table-cell;
+	padding: 0 8px;
+	width: 100%;
+}
 
-		li {
-			color: #fff;
-			background: transparent;
-			color: #fff;
-			font-size: 0.28rem;
-		}
+.bs-sysMsg .msg__content a.item {
+	color: #e6a23c;
+	font-size: 14px;
+	opacity: 0.75;
+}
 
-		.el-select-dropdown__item:hover,
-		.el-select-dropdown__item.hover {
-			background-color: rgba(110, 147, 206, 0.2);
-			margin-right: 1px;
-		}
+.bs-sysMsg .msg__content a.item:hover {
+	text-decoration: underline;
+}
 
-		.popper__arrow::after {
-			border-bottom-color: $item-bg-color;
-		}
+/* 修改下拉选项的样式 */
 
-		.popper__arrow {
-			border-bottom-color: $item-bg-color;
-		}
 
-		.el-select-dropdown__empty {
-			padding: 0.2rem;
-			font-size: 0.28rem;
-		}
-	}
+.version_select {
+	width: 100%;
+	margin-right: -5px;
+	padding-right: 10px;
+}
 
-	.version_select {
-		width: 100%;
-		margin-right: -5px;
-		padding-right: 10px;
-	}
+.version_select .el-select>.el-input {
+	width: 100px;
+}
 
-	.version_select .el-select>.el-input {
-		width: 100px;
-	}
+/* ****************************** */
+.wrapper {
+	width: 100%;
+	height: 100%;
+	background: #f0f0f0;
+}
 
-	/* ****************************** */
-	.wrapper {
-		width: 100%;
-		height: 100%;
-		background: #f0f0f0;
-	}
+.header {
+	position: relative;
+	box-sizing: border-box;
+	width: 100%;
+	height: 70px;
+	font-size: 22px;
+}
 
-	.header {
-		position: relative;
-		box-sizing: border-box;
-		width: 100%;
-		height: 70px;
-		font-size: 22px;
-	}
+.header .logo {
+	float: left;
+	margin-left: 60px;
+	margin-top: 17.5px;
+	height: 29px;
+	width: 160px;
+	vertical-align: middle;
+}
 
-	.header .logo {
-		float: left;
-		margin-left: 60px;
-		margin-top: 17.5px;
-		height: 29px;
-		width: 160px;
-		vertical-align: middle;
-	}
+/* --------------- 用户头像区域的样式 ---------------- */
+.header-right {
+	float: right;
+	padding-right: 50px;
+}
 
-	/* --------------- 用户头像区域的样式 ---------------- */
-	.header-right {
-		float: right;
-		padding-right: 50px;
-	}
+.header-user-con {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 70px;
+}
 
-	.header-user-con {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 70px;
-	}
+.user-avator {
+	margin-left: 20px;
+}
 
-	.user-avator {
-		margin-left: 20px;
-	}
+.user-avator img {
+	display: block;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+}
 
-	.user-avator img {
-		display: block;
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-	}
+.user-name {
+	margin-left: 10px;
+}
 
-	.user-name {
-		margin-left: 10px;
-	}
+.el-dropdown-link {
+	cursor: pointer;
+}
 
-	.el-dropdown-link {
-		cursor: pointer;
-	}
+.el-dropdown-menu__item {
+	text-align: center;
+}
 
-	.el-dropdown-menu__item {
-		text-align: center;
-	}
+/* --------------- 水平一级菜单栏的样式--------------------- */
+.el-menu.el-menu--horizontal {
+	border-bottom: none !important;
+	float: left;
+	margin-left: 50px;
+	background: transparent;
+}
 
-	/* --------------- 水平一级菜单栏的样式--------------------- */
-	.el-menu.el-menu--horizontal {
-		border-bottom: none !important;
-		float: left;
-		margin-left: 50px;
-		background: transparent;
-	}
-
-	.el-menu--horizontal>.el-menu-item.is-active {
-		/* border-bottom: 2px solid #3989fa;
+.el-menu--horizontal>.el-menu-item.is-active {
+	/* border-bottom: 2px solid #3989fa;
   color: #3989fa; */
-		font-weight: bold;
-	}
+	font-weight: bold;
+}
 
-	.el-menu--horizontal>.el-menu-item {
-		font-size: 16px;
-		margin: 0 15px;
-	}
+.el-menu--horizontal>.el-menu-item {
+	font-size: 16px;
+	margin: 0 15px;
+}
 </style>
